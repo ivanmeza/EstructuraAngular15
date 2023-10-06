@@ -1,0 +1,75 @@
+<nz-layout class="app-layout">
+
+    <nz-sider class="menu-sidebar" nzCollapsible nzWidth="256px" nzBreakpoint="md" [(nzCollapsed)]="isCollapsed"
+        [nzTrigger]="null">
+        <div class="sidebar-logo">
+            <a (click)="home()">
+                <img src="https://ng.ant.design/assets/img/logo.svg" alt="logo">
+                <h1>FIRMA</h1>
+            </a>
+        </div>
+        <div>
+            <ul nz-menu nzMode="inline" nzTheme="dark" [nzInlineCollapsed]="isCollapsed">
+
+                <li routerLink="/panel/firma" nz-menu-item nz-tooltip nzTooltipPlacement="right" [nzMatchRouter]="ruta">
+                    <span nz-icon nzType="edit" nzTheme="outline"></span>
+                    <span>Firma</span>
+                </li>
+                <!-- <li routerLink="/panel/usuarios" nz-menu-item nz-tooltip nzTooltipPlacement="right"
+                    [nzMatchRouter]="ruta">
+                    <span nz-icon nzType="user" nzTheme="outline"></span>
+                    <span>Usuarios</span>
+                </li> -->
+            </ul>
+        </div>
+    </nz-sider>
+    <nz-layout>
+        <nz-header>
+            <div class="app-header">
+                <div>
+                    <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
+                        <span class="trigger" nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></span>
+                    </span>
+                </div>
+                <div *ngIf="width<768">
+                    <button style="margin-right: 10px;" nzTrigger="click" nzType="text" nz-button nz-dropdown
+                        [nzDropdownMenu]="menu5">
+                        {{ usuario == null ? "Administrador" : 'usuario' }}
+                        <i nz-icon nzType="down"></i>
+                    </button>
+                    <nz-dropdown-menu #menu5="nzDropdownMenu">
+                        <ul nz-menu>
+                            <li class="logout" (click)="logout()" nz-menu-item>
+                                Cerrar sesión
+                                <i style="margin-left: 10px" nz-icon nzType="logout" nzTheme="outline"></i>
+                            </li>
+                        </ul>
+                    </nz-dropdown-menu>
+                </div>
+                <div *ngIf="width>768">
+
+                    <button style="margin-right: 10px;" nzTrigger="click" nzType="text" nz-button nz-dropdown
+                        [nzDropdownMenu]="menu5">
+                        {{ usuario == null ? "Administrador" : usuario }}
+                        <i nz-icon nzType="down"></i>
+                    </button>
+                    <nz-dropdown-menu #menu5="nzDropdownMenu">
+                        <ul nz-menu>
+                            <li class="logout" (click)="logout()" nz-menu-item>
+                                Cerrar sesión
+                                <i style="margin-left: 10px" nz-icon nzType="logout" nzTheme="outline"></i>
+                            </li>
+                        </ul>
+                    </nz-dropdown-menu>
+                </div>
+            </div>
+        </nz-header>
+        <nz-content>
+
+            <div class="inner-content">
+                <router-outlet></router-outlet>
+            </div>
+
+        </nz-content>
+    </nz-layout>
+</nz-layout>

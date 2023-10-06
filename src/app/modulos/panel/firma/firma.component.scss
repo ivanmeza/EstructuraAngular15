@@ -1,0 +1,50 @@
+.row-active {
+ 
+    background-color: #82a5ea;
+    color: white;
+  }
+  .ant-table-thead
+    > tr
+    .row-active.ant-table-row-hover:not(.ant-table-expanded-row)
+    > td,
+  .ant-table-tbody
+    > tr.row-active.ant-table-row-hover:not(.ant-table-expanded-row)
+    > td,
+  .ant-table-thead > tr.row-active:hover:not(.ant-table-expanded-row) > td,
+  .ant-table-tbody > tr.row-active:hover:not(.ant-table-expanded-row) > td {
+    background: #82a5ea;
+    color: white;
+  }
+
+  .pagination-container {
+    text-align: right;
+  }
+  .usuario{
+    overflow: hidden;
+    color: rgba(0, 0, 0, 0.85);
+    font-weight: 500;
+    font-size: 16px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .search-box {
+    padding: 8px;
+  }
+
+  .search-box input {
+    width: 188px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .search-box button {
+    width: 90px;
+  }
+
+  .search-button {
+    margin-right: 8px;
+  }
+  .picker {
+    width: 100%;
+  }

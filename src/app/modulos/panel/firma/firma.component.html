@@ -1,0 +1,254 @@
+<button style="margin-bottom:10px" nz-button nzType="primary" (click)="subirFile()">Subir Documento</button>
+<div nz-row [nzGutter]="[0, 35]">
+    <div nz-col [nzXs]="{ span: 24 }">
+        <nz-collapse>
+            <nz-collapse-panel nzHeader="Formulario de busqueda" [nzExtra]="extraTpl">
+                <form nz-form [formGroup]="SearchDocuemntos">
+                    <div nz-row [nzGutter]="[24, 8]">
+                        <div nz-col nzXs="24" nzMd="15" nzLg="15">
+                            Nombre del documento:
+                            <nz-form-item>
+                                <nz-form-control nzHasFeedback [nzErrorTip]="nombreDocumento">
+                                    <input formControlName="nomDocumentobuscador" name="nomDocumentobuscador"
+                                        [(ngModel)]="SearchDoc.nombreDocumentoSearch" nz-input />
+                                    <ng-template #nombreDocumento let-control>
+                                        <ng-container *ngIf="control.hasError('required')">El nombre del documento
+                                            es
+                                            obligatorio</ng-container>
+                                    </ng-template>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+
+                        <div style="display: flex;justify-content: flex-end;" nz-col nzXs="24" nzMd="9" nzLg="9">
+                            <button (click)="BuscardorFile()" style="margin-top: 16px;margin-right: 15px;" nz-button
+                                nzType="primary" nzSize="large" [nzLoading]="isConfirmLoadingBuscador">
+                                <span nz-icon nzType="search" nzTheme="outline"></span>
+                                buscar
+                            </button>
+                            <button (click)="ReloadFiles()" style="margin-top: 16px;" nz-button nzType="primary"
+                                nzSize="large" [nzLoading]="isConfirmLoadingBuscador">
+                                <span nz-icon nzType="reload" nzTheme="outline"></span>
+                                Cargar Documentos
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </nz-collapse-panel>
+        </nz-collapse>
+    </div>
+</div>
+<ng-template #extraTpl>
+    <i nz-icon nzType="search" (click)="$event.stopPropagation()"></i>
+</ng-template>
+<nz-divider class="drop-divider"></nz-divider>
+<nz-spin *ngIf="loadingtablaAmparos" [nzSize]="'large'" nzTip="Cargando Documentos...">
+    <nz-alert nzType="info" nzMessage="." nzDescription="."></nz-alert>
+</nz-spin>
+<nz-table style="margin-top:15px" #firmaTable [nzData]="firmaLista" [nzScroll]="{ x: '900px', y: '600px' }"
+    [nzShowPagination]="false">
+    <thead>
+        <tr>
+            <th nzCustomFilter>ID documento
+                <nz-filter-trigger [nzDropdownMenu]="menu">
+                    <span nz-icon nzType="search"></span>
+                </nz-filter-trigger>
+            </th>
+            <th>Nombre Documento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngFor="let data of firmaTable.data; index as i">
+            <tr (click)="documentosSelectRow(data, i)" [class]="i == firmaIndex ? 'row-active' : ''">
+                <td>{{ data.id_doc_firma }}</td>
+                <td>{{ data.nombre_original }}</td>
+                <td>{{ data.estado }}</td>
+                <td style="background-color: white">
+                    <button nz-button nzTrigger="click" nz-dropdown [nzDropdownMenu]="menu4">
+                        Opciones
+                        <span nz-icon nzType="down"></span>
+                    </button>
+                    <nz-dropdown-menu #menu4="nzDropdownMenu">
+                        <ul nz-menu>
+                            <li (click)="modalFirmar()" nz-menu-item>Firmar</li>
+                            <li (click)="VerDocumento()" nz-menu-item>Ver Documento</li>
+                        </ul>
+                    </nz-dropdown-menu>
+                </td>
+            </tr>
+        </ng-container>
+    </tbody>
+</nz-table>
+<nz-dropdown-menu #menu="nzDropdownMenu">
+    <div class="ant-table-filter-dropdown">
+        <div class="search-box">
+            <input type="text" nz-input placeholder="Search name" />
+            <!-- <nz-date-picker class="picker" formControlName="fecha_inicio" name="fecha_inicio"></nz-date-picker> -->
+            <!-- <button nz-button nzSize="small" nzType="primary" class="search-button">Search</button>
+            <button nz-button nzSize="small">Reset</button> -->
+        </div>
+    </div>
+</nz-dropdown-menu>
+<br />
+<div class="pagination-container">
+    <nz-pagination [nzPageIndex]="pageindex" [nzTotal]="totalItems" [nzPageSize]="limit"
+        (nzPageIndexChange)="onPageIndexChange($event)" nzShowQuickJumper></nz-pagination>
+</div>
+<!-- modal firmar -->
+<nz-modal nzWidth="45vw" [(nzVisible)]="modalvisiblefirma" nzTitle="Firma digital" (nzOnCancel)="Cancelmodalfirma()">
+    <div *nzModalContent>
+        <div nz-row [nzGutter]="[0, 35]">
+            <div nz-col [nzXs]="{ span: 24 }">
+                <form nz-form [formGroup]="credencialesFirma">
+
+                    <div nz-row [nzGutter]="[24, 8]">
+
+                        <div nz-col nzXs="24" nzMd="24" nzLg="24">
+                            <nz-card [nzCover]="coverTemplate" [nzActions]="[]">
+                                <nz-card-meta :nzTitle="Nombre: {{ firmaSelected.nombre_original}}"
+                                    [nzAvatar]="avatarTemplate"></nz-card-meta>
+                            </nz-card>
+                            <ng-template #avatarTemplate>
+                                <nz-avatar
+                                    nzSrc="https://e7.pngegg.com/pngimages/480/1001/png-clipart-graphics-pdf-file-format-adobe-systems-pdf-icon-angle-image-file-formats-thumbnail.png"></nz-avatar>
+                            </ng-template>
+                            <ng-template #coverTemplate>
+                                <!-- <img alt="example"
+                                    src="https://e7.pngegg.com/pngimages/133/777/png-clipart-pdf-adobe-acrobat-printer-computer-icons-document-printer-electronics-text.png" /> -->
+                            </ng-template>
+
+                            Firma Sistema
+                            <nz-form-item>
+                                <nz-form-control nzHasFeedback [nzErrorTip]="nombre">
+
+                                    <input style="text-transform: uppercase" [(ngModel)]="firma.pass"
+                                        formControlName="firmaSistema" name="pass" nz-input />
+                                    <ng-template #nombre let-control>
+                                        <ng-container *ngIf="control.hasError('pattern')">No puede ingresar números
+                                            ni
+                                            carácteres especiales
+                                        </ng-container>
+                                        <ng-container *ngIf="control.hasError('required')">El nombre es
+                                            obligatorio</ng-container>
+                                        <ng-container *ngIf="control.hasError('minlength')">El minimo de caracteres es
+                                            de 8</ng-container>
+                                        <ng-container *ngIf="control.hasError('maxlength')">El maximo de caracteres es
+                                            de 16</ng-container>
+                                    </ng-template>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                        <div nz-col nzXs="24" nzMd="24" nzLg="24">
+                            Firma Electronica
+                            <nz-form-item>
+                                <nz-form-control nzHasFeedback [nzErrorTip]="nombre">
+
+                                    <input style="text-transform: uppercase" [(ngModel)]="firma.pass_firma"
+                                        formControlName="firmaElectronica" name="pass_firma" nz-input />
+                                    <ng-template #nombre let-control>
+                                        <ng-container *ngIf="control.hasError('pattern')">No puede ingresar números
+                                            ni
+                                            carácteres especiales
+                                        </ng-container>
+                                        <ng-container *ngIf="control.hasError('required')">El nombre es
+                                            obligatorio</ng-container>
+                                        <ng-container *ngIf="control.hasError('minlength')">El minimo de caracteres es
+                                            de 8</ng-container>
+                                        <ng-container *ngIf="control.hasError('maxlength')">El maximo de caracteres es
+                                            de 16</ng-container>
+                                    </ng-template>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div *nzModalFooter>
+        <button nz-button nzType="default" (click)="Cancelmodalfirma()">Cancelar</button>
+        <button nz-button nzType="primary" (click)="firmarDocumento()"
+            [nzLoading]="isConfirmLoadingFirma">Aceptar</button>
+    </div>
+</nz-modal>
+<!-- modal subida documento -->
+<nz-modal nzWidth="70vw" [(nzVisible)]="modalDocumento" nzTitle="Subir Documento" (nzOnCancel)="CancelModalSubirFile()">
+    <div *nzModalContent>
+        <div nz-row [nzGutter]="[0, 35]">
+            <div nz-col [nzXs]="{ span: 24 }">
+                <form nz-form [formGroup]="file">
+
+                    <div nz-row [nzGutter]="[24, 8]">
+
+                        <div nz-col nz-col nzXs="24" nzMd="12" nzLg="12">
+                            <nz-divider *ngIf="firma.documentos[0].files[0] != null"></nz-divider>
+                            Documento:
+                            <nz-form-item>
+                                <nz-form-control nzHasFeedback [nzErrorTip]="filefirma">
+                                    <div *ngIf="firma.documentos[0].files[0] == null">
+
+                                        <label class="ant-btn ant-btn-text ant-btn-round ant-btn-sm" [for]="'docFirma'">
+                                            <i nz-icon nzType="upload"></i>
+                                            Añadir
+                                        </label>
+                                        <input style="display: none" [id]="'docFirma'" type="file" accept=".pdf"
+                                            (change)="selectMultipleImageDinamico($event)" />
+                                    </div>
+
+                                    <nz-table style="margin-top:20px" *ngIf="firma.documentos[0].files.length != 0"
+                                        #basicTable [nzData]=" firma.documentos[0].files">
+                                        <thead>
+                                            <tr>
+                                                <th nzWidth="150px" class="header-tabla">
+                                                    Nombre Archivo
+                                                </th>
+
+                                                <th nzWidth="150px" class="header-tabla">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let data of basicTable.data; let i = index">
+                                                <td>{{ data.name }}</td>
+
+                                                <td>
+                                                    <button (click)="cancelfile()" nz-button nzType="primary" nzDanger>
+                                                        Cancelar
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </nz-table>
+                                    <input type="hidden" [formControlName]="'docFirma'" [name]="'docFirma'" [(ngModel)]="
+                                        firma.documentos[0].files.length === 0
+                                            ? null
+                                            : firma.documentos[0].files.length
+                                        " nz-input />
+                                    <ng-template #filefirma let-control>
+                                        <ng-container *ngIf="control.hasError('required')">El documento es
+                                            obligatorio
+                                        </ng-container>
+                                    </ng-template>
+                                </nz-form-control>
+                            </nz-form-item>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div *nzModalFooter>
+        <button nz-button nzType="default" (click)="CancelModalSubirFile()">Cancelar</button>
+        <button nz-button nzType="primary" (click)="guardarFile()" [nzLoading]="isConfirmLoadingFile">Aceptar</button>
+    </div>
+</nz-modal>
+<!-- modal ver documento -->
+<nz-modal nzClassName="modalVerPDF" nzWidth="90vw" [(nzVisible)]="verDocumentoModal"
+    (nzOnCancel)="verDocumentoModal=false;" (nzOnOk)="verDocumentoModal=false;">
+    <ng-container *nzModalContent>
+        <!-- <iframe *ngIf="estado==1" style="height: 75vh;width: 100%;" [src]="url|safe"></iframe>-->
+
+        <iframe style="height: 75vh;width: 100%;" [src]="url"></iframe>
+    </ng-container>
+</nz-modal>
